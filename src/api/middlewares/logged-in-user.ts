@@ -1,12 +1,28 @@
-import { UserService } from "@medusajs/medusa";
-import { User } from "../../models/user";
+import type {
+  MedusaNextFunction,
+  MedusaRequest,
+  MedusaResponse,
+  User,
+  UserService,
+} from "@medusajs/medusa";
 
-export async function registerLoggedInUser(req, res, next) {
+interface Request extends MedusaRequest {
+  session?: {
+    user_id?: string;
+  };
+}
+
+export const registerLoggedInUser = async (
+  req: Request,
+  res: MedusaResponse,
+  next: MedusaNextFunction
+) => {
   let loggedInUser: User | null = null;
 
-  if (req.user && req.user.userId) {
+  const userId = req.user?.userId ?? req.session?.user_id;
+  if (userId) {
     const userService = req.scope.resolve("userService") as UserService;
-    loggedInUser = await userService.retrieve(req.user.userId);
+    loggedInUser = await userService.retrieve(userId);
   }
 
   req.scope.register({
@@ -16,4 +32,4 @@ export async function registerLoggedInUser(req, res, next) {
   });
 
   next();
-}
+};
