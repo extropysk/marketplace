@@ -1,8 +1,15 @@
-import { UserService as MedusaUserService } from "@medusajs/medusa";
+import { Currency, UserService as MedusaUserService } from "@medusajs/medusa";
 import { CreateUserInput as MedusaCreateUserInput } from "@medusajs/medusa/dist/types/user";
 import { Lifetime } from "awilix";
 import { User } from "../models/user";
 import StoreRepository from "../repositories/store";
+
+const DEFAULT_CURRENCY: Currency = {
+  code: "eur",
+  symbol: "",
+  symbol_native: "",
+  name: "",
+};
 
 type CreateUserInput = {
   store_id?: string;
@@ -22,6 +29,9 @@ class UserService extends MedusaUserService {
     if (!user.store_id) {
       const storeRepo = this.manager_.withRepository(this.storeRepository_);
       let newStore = storeRepo.create();
+      newStore.name = user.email;
+      newStore.currencies = [DEFAULT_CURRENCY];
+      newStore.default_currency = DEFAULT_CURRENCY;
       newStore = await storeRepo.save(newStore);
       user.store_id = newStore.id;
     }
