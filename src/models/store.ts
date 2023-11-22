@@ -1,6 +1,7 @@
 import { Store as MedusaStore } from "@medusajs/medusa";
 import { Column, Entity, OneToMany } from "typeorm";
 import { Product } from "./product";
+import { ProductCollection } from "./product-collection";
 import { User } from "./user";
 
 @Entity()
@@ -13,4 +14,7 @@ export class Store extends MedusaStore {
 
   @OneToMany(() => Product, (product) => product?.store)
   products?: Product[];
+
+  @OneToMany(() => ProductCollection, (product) => product?.store)
+  collections?: ProductCollection[];
 }
