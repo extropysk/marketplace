@@ -1,10 +1,13 @@
 import { Store as MedusaStore } from "@medusajs/medusa";
-import { Entity, OneToMany } from "typeorm";
+import { Column, Entity, OneToMany } from "typeorm";
 import { Product } from "./product";
 import { User } from "./user";
 
 @Entity()
 export class Store extends MedusaStore {
+  @Column({ nullable: true })
+  origin?: string;
+
   @OneToMany(() => User, (user) => user?.store)
   members?: User[];
 

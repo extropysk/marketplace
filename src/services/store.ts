@@ -1,10 +1,11 @@
 import {
   FindConfig,
   StoreService as MedusaStoreService,
-  Store,
   User,
 } from "@medusajs/medusa";
 import { Lifetime } from "awilix";
+import { Store } from "src/models/store";
+import { Repository } from "typeorm";
 
 class StoreService extends MedusaStoreService {
   static LIFE_TIME = Lifetime.SCOPED;
@@ -21,6 +22,23 @@ class StoreService extends MedusaStoreService {
     }
   }
 
+  async retrieveByOrigin(
+    origin: string,
+    config?: FindConfig<Store>
+  ): Promise<Store> {
+    const storeRepo = this.manager_.withRepository<Store, Repository<Store>>(
+      this.storeRepository_
+    );
+    const store = await storeRepo.findOne({
+      ...config,
+      where: {
+        origin: origin,
+      },
+    });
+
+    return store;
+  }
+
   async retrieve(config?: FindConfig<Store>): Promise<Store> {
     if (!this.loggedInUser_) {
       return super.retrieve(config);
@@ -30,7 +48,9 @@ class StoreService extends MedusaStoreService {
   }
 
   async retrieveForLoggedInUser(config?: FindConfig<Store>) {
-    const storeRepo = this.manager_.withRepository(this.storeRepository_);
+    const storeRepo = this.manager_.withRepository<Store, Repository<Store>>(
+      this.storeRepository_
+    );
     const store = await storeRepo.findOne({
       ...config,
       relations: [...config.relations, "members"],
