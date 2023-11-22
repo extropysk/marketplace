@@ -1,16 +1,16 @@
 import { MiddlewaresConfig } from "@medusajs/medusa";
-import { registerLoggedInUser } from "./logged-in-user";
-import { registerStore } from "./store";
+import { registerStoreOrigin } from "./store-origin";
+import { registerStoreSession } from "./store-session";
 
 export const config: MiddlewaresConfig = {
   routes: [
     {
       matcher: /\/admin\/[^(auth)].*/,
-      middlewares: [registerLoggedInUser],
+      middlewares: [registerStoreSession],
     },
     {
       matcher: "/store/*",
-      middlewares: [registerStore],
+      middlewares: [registerStoreOrigin],
     },
   ],
 };

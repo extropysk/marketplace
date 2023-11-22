@@ -1,7 +1,6 @@
 import {
   FindConfig,
   StoreService as MedusaStoreService,
-  User,
 } from "@medusajs/medusa";
 import { Lifetime } from "awilix";
 import { Store } from "src/models/store";
@@ -9,14 +8,14 @@ import { Repository } from "typeorm";
 
 class StoreService extends MedusaStoreService {
   static LIFE_TIME = Lifetime.SCOPED;
-  protected readonly loggedInUser_: User | null;
+  protected readonly _store: Store | null;
 
   constructor(container, options) {
     // @ts-expect-error prefer-rest-params
     super(...arguments);
 
     try {
-      this.loggedInUser_ = container.loggedInUser;
+      this._store = container.store;
     } catch (e) {
       // avoid errors when backend first runs
     }
@@ -40,7 +39,7 @@ class StoreService extends MedusaStoreService {
   }
 
   async retrieve(config?: FindConfig<Store>): Promise<Store> {
-    if (!this.loggedInUser_) {
+    if (!this._store?.id) {
       return super.retrieve(config);
     }
 
@@ -55,7 +54,7 @@ class StoreService extends MedusaStoreService {
       ...config,
       relations: [...config.relations, "members"],
       where: {
-        id: this.loggedInUser_.store_id,
+        id: this._store?.id,
       },
     });
 

@@ -1,6 +1,7 @@
 import { UserService as MedusaUserService } from "@medusajs/medusa";
 import { CreateUserInput as MedusaCreateUserInput } from "@medusajs/medusa/dist/types/user";
 import { Lifetime } from "awilix";
+import { Store } from "src/models/store";
 import { User } from "../models/user";
 import StoreRepository from "../repositories/store";
 
@@ -10,7 +11,7 @@ type CreateUserInput = {
 
 class UserService extends MedusaUserService {
   static LIFE_TIME = Lifetime.SCOPED;
-  protected readonly loggedInUser_: User | null;
+  protected readonly _store: Store | null;
   protected readonly storeRepository_: typeof StoreRepository;
 
   constructor(container, options) {
@@ -19,7 +20,7 @@ class UserService extends MedusaUserService {
     this.storeRepository_ = container.storeRepository;
 
     try {
-      this.loggedInUser_ = container.loggedInUser;
+      this._store = container.store;
     } catch (e) {
       // avoid errors when backend first runs
     }

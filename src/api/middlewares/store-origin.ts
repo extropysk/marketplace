@@ -6,7 +6,7 @@ import type {
 import { Store } from "src/models/store";
 import StoreService from "src/services/store";
 
-export const registerStore = async (
+export const registerStoreOrigin = async (
   req: MedusaRequest,
   res: MedusaResponse,
   next: MedusaNextFunction

@@ -1,7 +1,6 @@
 import {
   ProductService as MedusaProductService,
   Product,
-  User,
 } from "@medusajs/medusa";
 import {
   FindProductConfig,
@@ -9,6 +8,7 @@ import {
   ProductSelector as MedusaProductSelector,
 } from "@medusajs/medusa/dist/types/product";
 import { Lifetime } from "awilix";
+import { Store } from "src/models/store";
 
 type ProductSelector = {
   store_id?: string;
@@ -20,14 +20,14 @@ type CreateProductInput = {
 
 class ProductService extends MedusaProductService {
   static LIFE_TIME = Lifetime.SCOPED;
-  protected readonly loggedInUser_: User | null;
+  protected readonly _store: Store | null;
 
   constructor(container, options) {
     // @ts-expect-error prefer-rest-params
     super(...arguments);
 
     try {
-      this.loggedInUser_ = container.loggedInUser;
+      this._store = container.store;
     } catch (e) {
       // avoid errors when backend first runs
     }
@@ -37,8 +37,8 @@ class ProductService extends MedusaProductService {
     selector: ProductSelector,
     config?: FindProductConfig
   ): Promise<Product[]> {
-    if (!selector.store_id && this.loggedInUser_?.store_id) {
-      selector.store_id = this.loggedInUser_.store_id;
+    if (!selector.store_id && this._store?.id) {
+      selector.store_id = this._store?.id;
     }
 
     config.select?.push("store_id");
@@ -52,8 +52,8 @@ class ProductService extends MedusaProductService {
     selector: ProductSelector,
     config?: FindProductConfig
   ): Promise<[Product[], number]> {
-    if (!selector.store_id && this.loggedInUser_?.store_id) {
-      selector.store_id = this.loggedInUser_.store_id;
+    if (!selector.store_id && this._store?.id) {
+      selector.store_id = this._store?.id;
     }
 
     config.select?.push("store_id");
@@ -73,8 +73,8 @@ class ProductService extends MedusaProductService {
 
     if (
       product.store?.id &&
-      this.loggedInUser_?.store_id &&
-      product.store.id !== this.loggedInUser_.store_id
+      this._store?.id &&
+      product.store.id !== this._store?.id
     ) {
       // Throw error if you don't want a product to be accessible to other stores
       throw new Error("Product does not exist in store.");
@@ -84,8 +84,8 @@ class ProductService extends MedusaProductService {
   }
 
   async create(productObject: CreateProductInput): Promise<Product> {
-    if (!productObject.store_id && this.loggedInUser_?.store_id) {
-      productObject.store_id = this.loggedInUser_.store_id;
+    if (!productObject.store_id && this._store?.id) {
+      productObject.store_id = this._store?.id;
     }
 
     return await super.create(productObject);
