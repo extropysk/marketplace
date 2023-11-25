@@ -64,10 +64,7 @@ class ProductService extends MedusaProductCollectionService {
     collectionId: string,
     config?: FindConfig<ProductCollection>
   ): Promise<ProductCollection> {
-    const collection = (await super.retrieve(
-      collectionId,
-      config
-    )) as ProductCollection;
+    const collection = await super.retrieve(collectionId, config);
 
     if (collection.store_id !== this._store?.id) {
       throw new Error("Collection does not exist in store.");
@@ -80,10 +77,7 @@ class ProductService extends MedusaProductCollectionService {
     collectionHandle: string,
     config?: FindConfig<ProductCollection>
   ): Promise<ProductCollection> {
-    const collection = (await super.retrieveByHandle(
-      collectionHandle,
-      config
-    )) as ProductCollection;
+    const collection = await super.retrieveByHandle(collectionHandle, config);
     if (collection.store_id !== this._store?.id) {
       throw new Error("Collection does not exist in store.");
     }
